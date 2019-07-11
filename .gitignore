@@ -1,0 +1,15 @@
+
+.idea/compiler.xml
+.idea/misc.xml
+.idea/uiDesigner.xml
+.idea/vcs.xml
+.idea/workspace.xml
+snippets2.iml
+target/classes/org/psc/fieldfilter/DefaultDto$Aggregate.class
+target/classes/org/psc/fieldfilter/DefaultDto$AggregateWithMap.class
+target/classes/org/psc/fieldfilter/DefaultDto$NestedAggregate.class
+target/classes/org/psc/fieldfilter/DefaultDto$PrimitiveIntWrapper.class
+target/classes/org/psc/fieldfilter/DefaultDto$StringWrapper.class
+target/classes/org/psc/fieldfilter/DefaultDto.class
+target/classes/org/psc/fieldfilter/FieldFilter.class
+target/test-classes/org/psc/fieldfilter/FieldFilterTest.class
