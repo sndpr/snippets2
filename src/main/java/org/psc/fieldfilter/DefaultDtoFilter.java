@@ -22,7 +22,7 @@ public class DefaultDtoFilter implements JsonFilter<DefaultDto, Integer> {
             instance.setAggregates(null);
         }
 
-        instance.setAggregate(filterAggregate(instance.getAggregate());
+        instance.setAggregate(filterAggregate(instance.getAggregate()));
 
         if (instance.getAlphanumericId().equals(String.valueOf(FILTER_VALUE))) {
             instance.setAlphanumericId(null);
