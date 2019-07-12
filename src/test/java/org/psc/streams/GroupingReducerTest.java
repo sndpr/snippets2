@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 @Slf4j
 public class GroupingReducerTest {
 
@@ -26,8 +30,8 @@ public class GroupingReducerTest {
         GroupingReducer.JoinType joinType3 = new GroupingReducer.JoinType().withJoinedTypes(
                 Map.of(GroupingReducer.TypeWithList.class, first, Integer.class, 3));
 
-        GroupingReducer.JoinType joinType4 = new GroupingReducer.JoinType().withJoinedTypes(
-                Map.of(GroupingReducer.TypeWithList.class, second));
+        GroupingReducer.JoinType joinType4 =
+                new GroupingReducer.JoinType().withJoinedTypes(Map.of(GroupingReducer.TypeWithList.class, second));
 
         GroupingReducer.JoinType joinType5 = new GroupingReducer.JoinType().withJoinedTypes(
                 Map.of(GroupingReducer.TypeWithList.class, third, Integer.class, 54545));
@@ -50,6 +54,11 @@ public class GroupingReducerTest {
                         joinType9);
 
         GroupingReducer groupingReducer = new GroupingReducer();
-        groupingReducer.reduce(joinTypes);
+        List<GroupingReducer.TypeWithList> result = groupingReducer.reduce(joinTypes);
+
+        assertThat(result, is(notNullValue()));
+        assertThat(result.size(), is(4));
+        assertThat(result.stream().filter(e -> e.getId().equals("first")).findFirst().get().getInts().size(), is(3));
+
     }
 }
