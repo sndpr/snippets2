@@ -6,17 +6,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class GroupingReducer {
 
-    public List<TypeWithList> reduce(List<JoinType> rawData) {
-
-        rawData.get(0).get(TypeWithList.class);
-
+    public List<TypeWithList> reduce(@NotNull List<JoinType> rawData) {
         Map<TypeWithList, List<JoinType>> joinsMap =
                 rawData.stream().collect(Collectors.groupingBy(e -> e.get(TypeWithList.class), Collectors.toList()));
 
@@ -36,6 +36,20 @@ public class GroupingReducer {
         finalResult.forEach(fr -> fr.getInts().forEach(i -> log.info("{} - {}", fr, i)));
 
         return finalResult;
+    }
+
+    public List<TypeWithList> singleStreamReduce(@NotNull List<JoinType> rawData) {
+
+        Collection<TypeWithList> combinedData = rawData.stream()
+                .collect(Collectors.groupingBy(joinType -> joinType.get(TypeWithList.class),
+                        Collector.of(TypeWithList::new, (typeWithList, joinType) -> {
+                            typeWithList.setId(joinType.get(TypeWithList.class).getId());
+                            typeWithList.setData(joinType.get(TypeWithList.class).getData());
+                            typeWithList.getInts().add(joinType.get(Integer.class));
+                        }, (a, b) -> a, Function.identity())))
+                .values();
+
+        return new ArrayList<>(combinedData);
     }
 
     @Data
@@ -63,7 +77,7 @@ public class GroupingReducer {
         private List<Integer> ints = new ArrayList<>();
 
         @Override
-        public int compare(TypeWithList o1, TypeWithList o2) {
+        public int compare(@NotNull TypeWithList o1, @NotNull TypeWithList o2) {
             return o1.getId().compareTo(o2.getId());
         }
     }

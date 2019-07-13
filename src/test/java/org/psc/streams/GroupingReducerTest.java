@@ -60,5 +60,10 @@ public class GroupingReducerTest {
         assertThat(result.size(), is(4));
         assertThat(result.stream().filter(e -> e.getId().equals("first")).findFirst().get().getInts().size(), is(3));
 
+        List<GroupingReducer.TypeWithList> result1 = groupingReducer.singleStreamReduce(joinTypes);
+
+        assertThat(result, is(notNullValue()));
+        assertThat(result.size(), is(4));
+        assertThat(result.stream().filter(e -> e.getId().equals("first")).findFirst().get().getInts().size(), is(3));
     }
 }
