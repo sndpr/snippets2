@@ -13,3 +13,4 @@ target/classes/org/psc/fieldfilter/DefaultDto$StringWrapper.class
 target/classes/org/psc/fieldfilter/DefaultDto.class
 target/classes/org/psc/fieldfilter/FieldFilter.class
 target/test-classes/org/psc/fieldfilter/FieldFilterTest.class
+target/
