@@ -2,7 +2,7 @@ package org.psc.consec;
 
 import java.util.*;
 
-public class ConsecutiveSequencesCalulator {
+public class ConsecutiveSequencesCalculator {
 
     public static List<List<Integer>> calcConsecutiveSequences(int sum) {
         int upperBoundary = (int) Math.ceil(sum / 2.0);

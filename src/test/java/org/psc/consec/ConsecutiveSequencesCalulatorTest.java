@@ -14,7 +14,7 @@ class ConsecutiveSequencesCalulatorTest {
 
     @Test
     void testCalcConsecutiveSequences() {
-        List<List<Integer>> consecutiveSequences = ConsecutiveSequencesCalulator.calcConsecutiveSequences(5);
+        List<List<Integer>> consecutiveSequences = ConsecutiveSequencesCalculator.calcConsecutiveSequences(5);
 
         consecutiveSequences.stream()
                 .map(e -> e.stream().map(String::valueOf).collect(Collectors.joining(", ")))
@@ -22,7 +22,7 @@ class ConsecutiveSequencesCalulatorTest {
 
         assertThat(consecutiveSequences.size(), is(1));
 
-        consecutiveSequences = ConsecutiveSequencesCalulator.calcConsecutiveSequences(100);
+        consecutiveSequences = ConsecutiveSequencesCalculator.calcConsecutiveSequences(100);
 
         consecutiveSequences.stream()
                 .map(e -> e.stream().map(String::valueOf).collect(Collectors.joining(", ")))
