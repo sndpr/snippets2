@@ -42,11 +42,15 @@ public class GroupingReducer {
 
         Collection<TypeWithList> combinedData = rawData.stream()
                 .collect(Collectors.groupingBy(joinType -> joinType.get(TypeWithList.class),
-                        Collector.of(TypeWithList::new, (typeWithList, joinType) -> {
-                            typeWithList.setId(joinType.get(TypeWithList.class).getId());
-                            typeWithList.setData(joinType.get(TypeWithList.class).getData());
-                            typeWithList.getInts().add(joinType.get(Integer.class));
-                        }, (a, b) -> a, Function.identity())))
+                        Collector.of(TypeWithList::new,
+                                (typeWithList, joinType) -> {
+                                    typeWithList.setId(joinType.get(TypeWithList.class).getId());
+                                    typeWithList.setData(joinType.get(TypeWithList.class).getData());
+                                    typeWithList.getInts().add(joinType.get(Integer.class));
+                                }, (a, b) -> {
+                                    a.ints.addAll(b.ints);
+                                    return a;
+                                }, Function.identity())))
                 .values();
 
         return new ArrayList<>(combinedData);
