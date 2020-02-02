@@ -13,7 +13,6 @@ import static org.hamcrest.Matchers.notNullValue;
 @Slf4j
 public class GroupingReducerTest {
 
-
     @Test
     void testReduce() {
         GroupingReducer.TypeWithList first = new GroupingReducer.TypeWithList().withId("first").withData("some");
@@ -62,8 +61,14 @@ public class GroupingReducerTest {
 
         List<GroupingReducer.TypeWithList> result1 = groupingReducer.singleStreamReduce(joinTypes);
 
-        assertThat(result, is(notNullValue()));
-        assertThat(result.size(), is(4));
-        assertThat(result.stream().filter(e -> e.getId().equals("first")).findFirst().get().getInts().size(), is(3));
+        assertThat(result1, is(notNullValue()));
+        assertThat(result1.size(), is(4));
+        assertThat(result1.stream().filter(e -> e.getId().equals("first")).findFirst().get().getInts().size(), is(3));
+
+        List<GroupingReducer.TypeWithList> result2 = groupingReducer.singleStreamReduceWithSingletonWrapper(joinTypes);
+
+        assertThat(result2, is(notNullValue()));
+        assertThat(result2.size(), is(4));
+        assertThat(result2.stream().filter(e -> e.getId().equals("first")).findFirst().get().getInts().size(), is(3));
     }
 }

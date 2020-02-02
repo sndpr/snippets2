@@ -56,6 +56,28 @@ public class GroupingReducer {
         return new ArrayList<>(combinedData);
     }
 
+    public List<TypeWithList> singleStreamReduceWithSingletonWrapper(@NotNull List<JoinType> rawData) {
+
+        @SuppressWarnings("Convert2MethodRef")
+        Collection<TypeWithList> combinedData = rawData.stream()
+                .collect(Collectors.groupingBy(joinType -> joinType.get(TypeWithList.class),
+                        Collector.of(() -> new Singleton<TypeWithList>(),
+                                (accumulated, joinType) -> {
+                                    TypeWithList currentTypeWithList = joinType.get(TypeWithList.class);
+                                    TypeWithList accumulatedTypeWithList =
+                                            accumulated.getOrSetIfEmpty(joinType.get(TypeWithList.class));
+                                    if (!currentTypeWithList.equals(accumulatedTypeWithList)) {
+                                        currentTypeWithList.getInts().addAll(currentTypeWithList.getInts());
+                                    }
+                                }, (a, b) -> {
+                                    a.get().getInts().addAll(b.get().getInts());
+                                    return a;
+                                }, Singleton::get)))
+                .values();
+
+        return new ArrayList<>(combinedData);
+    }
+
     @Data
     @Wither
     @NoArgsConstructor
@@ -83,6 +105,137 @@ public class GroupingReducer {
         @Override
         public int compare(@NotNull TypeWithList o1, @NotNull TypeWithList o2) {
             return o1.getId().compareTo(o2.getId());
+        }
+    }
+
+    static class Singleton<E> implements Collection<E> {
+
+        private E element = null;
+
+        public static <E> Singleton<E> of(E element) {
+            Singleton<E> singleton = new Singleton<>();
+            singleton.element = element;
+            return singleton;
+        }
+
+        public E get() {
+            return element;
+        }
+
+        public <T extends E> E getOrSetIfEmpty(T element) {
+            if (this.element == null) {
+                this.element = element;
+            }
+            return this.element;
+        }
+
+        @Override
+        public int size() {
+            return isEmpty() ? 0 : 1;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return element == null;
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            return o.equals(element);
+        }
+
+        @NotNull
+        @Override
+        public Iterator<E> iterator() {
+            return new Iterator<>() {
+
+                private E current = element;
+
+                @Override
+                public boolean hasNext() {
+                    return current != null;
+                }
+
+                @Override
+                public E next() {
+                    E next = current;
+                    current = null;
+                    return next;
+                }
+            };
+        }
+
+        @NotNull
+        @Override
+        public Object[] toArray() {
+            return new Object[]{element};
+        }
+
+        @NotNull
+        @Override
+        public <T> T[] toArray(@NotNull T[] a) {
+            if (a.length > 0) {
+                //noinspection unchecked
+                a[1] = (T) element;
+                return a;
+            } else {
+                //noinspection unchecked
+                return (T[]) new Object[]{element};
+            }
+        }
+
+        @Override
+        public boolean add(E e) {
+            element = e;
+            return true;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            if (o.equals(element)) {
+                element = null;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean containsAll(@NotNull Collection<?> c) {
+            return c.stream().allMatch(collectionElement -> collectionElement.equals(element));
+        }
+
+        @Override
+        public boolean addAll(@NotNull Collection<? extends E> c) {
+            if (c.size() == 1) {
+                element = c.iterator().next();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean removeAll(@NotNull Collection<?> c) {
+            boolean removed = c.stream().anyMatch(collectionElement -> collectionElement.equals(element));
+            if (removed) {
+                element = null;
+            }
+            return removed;
+        }
+
+        @Override
+        public boolean retainAll(@NotNull Collection<?> c) {
+            boolean retain = c.stream().anyMatch(collectionElement -> collectionElement.equals(element));
+            if (!retain) {
+                element = null;
+            }
+            return retain;
+        }
+
+        @Override
+        public void clear() {
+            element = null;
         }
     }
 
