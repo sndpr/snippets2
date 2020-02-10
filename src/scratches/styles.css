@@ -1,0 +1,51 @@
+.container {
+    display: flex;
+}
+
+.content__container {
+    position: absolute;
+    margin-top: 10%;
+    margin-left: 20%;
+    display: flex;
+    flex-direction: column;
+}
+
+.rectangle {
+    height: 400px;
+    width: 711px;
+    background: darkblue;
+    transition: background ease-out 0.5s;
+}
+
+.rectangle:hover {
+    transition: background ease-in 0.5s;
+    background: aqua;
+    /*animation-name: change-color ;*/
+    /*animation-duration: 1s;*/
+}
+
+.image-container{
+    margin-top: 20px;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.image-canvas {
+    transition: 0.2s ease-out;
+    /*transform: scale(1.0);*/
+    opacity: 50%;
+}
+
+.image-canvas:hover {
+    transition: 0.2s ease-in;
+    transform: scale(1.2) translateY(-10px);
+    opacity: 100%;
+}
+
+@keyframes change-color {
+    from {
+    }
+    to {
+        background: aqua
+    }
+}
