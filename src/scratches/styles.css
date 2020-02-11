@@ -15,6 +15,23 @@
     width: 711px;
     background: darkblue;
     transition: background ease-out 0.5s;
+    /*animation-name: moving-linear-two-color-gradient;*/
+    /*animation-duration: 1s;*/
+    /*animation-iteration-count: infinite;*/
+    border-bottom: 10px solid red;
+    overflow: hidden;
+}
+
+.token {
+    height: 100%;
+    width: 20%;
+    background-color: red;
+    background-image: linear-gradient(to right, rgba(0,0,0,0.9) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.9) 75%);
+    color: white;
+    animation: moving-gradient;
+    animation-duration: 2s;
+    animation-timing-function: ease-in;
+    animation-iteration-count: infinite;
 }
 
 .rectangle:hover {
@@ -24,7 +41,7 @@
     /*animation-duration: 1s;*/
 }
 
-.image-container{
+.image-container {
     margin-top: 20px;
     display: inline-block;
     overflow: hidden;
@@ -40,6 +57,51 @@
     transition: 0.2s ease-in;
     transform: scale(1.1) translateY(-10px);
     opacity: 100%;
+}
+
+@keyframes moving-linear-two-color-gradient {
+    0% {
+        background: darkred;
+    }
+    25% {
+        background: linear-gradient(to right, red 0%, darkred 6%, darkred 100%);
+    }
+    50% {
+        background: linear-gradient(to right, darkred 0%, darkred 44%, red 50%, darkred 56%, darkred 100%);
+    }
+    75% {
+        background: linear-gradient(to right, darkred 0%, darkred 94%, red 100%);
+    }
+    100% {
+        background: darkred;
+    }
+}
+
+@keyframes moving-gradient {
+    from {
+        margin-left: -25%;
+    }
+    to {
+        margin-left: 125%;
+    }
+}
+
+@keyframes moving-linear-gradient {
+    0% {
+        background: linear-gradient(to right, red 0%, orange 25%, yellow 50%, green 75%, blue 100%);
+    }
+    25% {
+        background: linear-gradient(to right, blue 0%, red 25%, orange 50%, yellow 75%, green 100%);
+    }
+    50% {
+        background: linear-gradient(to right, green 0%, blue 25%, red 50%, orange 75%, yellow 100%);
+    }
+    75% {
+        background: linear-gradient(to right, yellow 0%, green 25%, blue 50%, red 75%, orange 100%);
+    }
+    100% {
+        background: linear-gradient(to right, orange 0%, yellow 25%, green 50%, blue 75%, red 100%);;
+    }
 }
 
 @keyframes change-color {
