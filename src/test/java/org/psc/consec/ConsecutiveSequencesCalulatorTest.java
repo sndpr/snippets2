@@ -1,13 +1,13 @@
 package org.psc.consec;
 
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 class ConsecutiveSequencesCalulatorTest {
@@ -20,7 +20,7 @@ class ConsecutiveSequencesCalulatorTest {
                 .map(e -> e.stream().map(String::valueOf).collect(Collectors.joining(", ")))
                 .forEach(log::info);
 
-        assertThat(consecutiveSequences.size(), is(1));
+        assertThat(consecutiveSequences.size()).isEqualTo(1);
 
         consecutiveSequences = ConsecutiveSequencesCalculator.calcConsecutiveSequences(100);
 
@@ -28,7 +28,7 @@ class ConsecutiveSequencesCalulatorTest {
                 .map(e -> e.stream().map(String::valueOf).collect(Collectors.joining(", ")))
                 .forEach(log::info);
 
-        assertThat(consecutiveSequences.size(), is(2));
+        Assertions.assertThat(consecutiveSequences.size()).isEqualTo(2);
     }
 
 }
