@@ -22,4 +22,16 @@ class ExtendedCollectorsTest {
         associatedData.forEach((key, value) -> log.info("{} : {}", key, value));
         assertThat(associatedData.keySet(), org.hamcrest.Matchers.containsInAnyOrder("1", "1123", "25", "9"));
     }
+
+    @Test
+    void associateWith() {
+        List<String> someData = List.of("1:abc", "1123:hasjkda", "25:LSasdq", "9:ASKDL");
+
+        Map<String, String> associatedData = someData.stream()
+                .collect(ExtendedCollectors.associateWith(s -> StringUtils.substringAfter(s, ":")));
+
+        associatedData.forEach((key, value) -> log.info("{} : {}", key, value));
+        assertThat(associatedData.values(),
+                org.hamcrest.Matchers.containsInAnyOrder("abc", "hasjkda", "LSasdq", "ASKDL"));
+    }
 }

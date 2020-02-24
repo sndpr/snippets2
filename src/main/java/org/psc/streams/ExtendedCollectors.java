@@ -24,4 +24,21 @@ public class ExtendedCollectors {
                 }
         );
     }
+
+    public static <V, T, R extends Map<T, V>> Collector<T, R, R> associateWith(Function<T, V> valueFunction) {
+        return associateWith(valueFunction, (a, b) -> {
+            throw new RuntimeException("key already present");
+        });
+    }
+
+    public static <V, T, R extends Map<T, V>> Collector<T, R, R> associateWith(Function<T, V> valueFunction,
+            BinaryOperator<V> remappingFunction) {
+        return Collector.of(() -> (R) new ConcurrentHashMap<T, V>(),
+                (accumulator, current) -> accumulator.put(current, valueFunction.apply(current)),
+                (a, b) -> {
+                    b.forEach((key, value) -> a.merge(key, value, remappingFunction));
+                    return a;
+                }
+        );
+    }
 }
