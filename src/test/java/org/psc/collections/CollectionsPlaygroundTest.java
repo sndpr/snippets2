@@ -66,7 +66,8 @@ class CollectionsPlaygroundTest {
     }
 
     @Test
-    void misc(){
+    void testDisjunction(){
         assertThat(CollectionsPlayground.disjunction()).contains("A", "B", "D", "E");
     }
+
 }
