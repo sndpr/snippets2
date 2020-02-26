@@ -2,10 +2,13 @@ package org.psc.collections;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.not;
 
 @Slf4j
 class CollectionsPlaygroundTest {
@@ -55,19 +58,28 @@ class CollectionsPlaygroundTest {
     }
 
     @Test
-    void testTrie(){
+    void testTrie() {
         var trie = CollectionsPlayground.trie();
         assertThat(trie).isNotEmpty();
     }
 
     @Test
-    void testCollect(){
+    void testCollect() {
         assertThat(CollectionsPlayground.collect()).isNotEmpty();
     }
 
     @Test
-    void testDisjunction(){
+    void testDisjunction() {
         assertThat(CollectionsPlayground.disjunction()).contains("A", "B", "D", "E");
+    }
+
+    @Test
+    void testCollate() {
+        List<Integer> first = List.of(2, 4, 7, 9);
+        List<Integer> second = List.of(1, 3, 5, 6, 7, 8, 9, 10);
+        Collection<Integer> collated = CollectionUtils.collate(first, second);
+        collated.forEach(i -> log.info("{}", i));
+        assertThat(collated.size()).isEqualTo(first.size() + second.size());
     }
 
 }
