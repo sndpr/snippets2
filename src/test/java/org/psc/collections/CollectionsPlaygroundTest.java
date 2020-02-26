@@ -79,6 +79,7 @@ class CollectionsPlaygroundTest {
         List<Integer> second = List.of(1, 3, 5, 6, 7, 8, 9, 10);
         Collection<Integer> collated = CollectionUtils.collate(first, second);
         collated.forEach(i -> log.info("{}", i));
+        assertThat(collated.iterator().next()).isEqualTo(1);
         assertThat(collated.size()).isEqualTo(first.size() + second.size());
     }
 
