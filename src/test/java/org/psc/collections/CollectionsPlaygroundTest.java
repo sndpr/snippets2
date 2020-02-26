@@ -5,6 +5,7 @@ import org.apache.commons.collections4.BidiMap;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.not;
 
 @Slf4j
 class CollectionsPlaygroundTest {
@@ -58,5 +59,11 @@ class CollectionsPlaygroundTest {
         var trie = CollectionsPlayground.trie();
 
         assertThat(trie).isNotEmpty();
+    }
+
+    @Test
+    void testCollect(){
+        assertThat(CollectionsPlayground.collect()).isNotEmpty();
+
     }
 }

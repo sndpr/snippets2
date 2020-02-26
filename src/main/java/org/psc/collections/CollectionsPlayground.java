@@ -2,6 +2,7 @@ package org.psc.collections;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.OrderedMap;
 import org.apache.commons.collections4.Trie;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
@@ -10,6 +11,8 @@ import org.apache.commons.collections4.trie.PatriciaTrie;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.AbstractMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -61,6 +64,13 @@ public class CollectionsPlayground {
         prefixMap2.forEach((key, value) -> log.info("{}: {}", key, value));
 
         return trie;
+    }
+
+    public static Collection<Double> collect() {
+        List<Integer> input = List.of(13, 7, 28, 94, 1, 9, 44, 8);
+        Collection<Double> output = CollectionUtils.collect(input, i -> i / 3d);
+        output.forEach(d -> log.info("{}", d));
+        return output;
     }
 
     private static Map.Entry<String, Integer> fromSimpleMapping(String input) {
