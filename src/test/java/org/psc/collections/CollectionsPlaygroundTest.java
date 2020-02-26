@@ -57,13 +57,16 @@ class CollectionsPlaygroundTest {
     @Test
     void testTrie(){
         var trie = CollectionsPlayground.trie();
-
         assertThat(trie).isNotEmpty();
     }
 
     @Test
     void testCollect(){
         assertThat(CollectionsPlayground.collect()).isNotEmpty();
+    }
 
+    @Test
+    void misc(){
+        assertThat(CollectionsPlayground.disjunction()).contains("A", "B", "D", "E");
     }
 }

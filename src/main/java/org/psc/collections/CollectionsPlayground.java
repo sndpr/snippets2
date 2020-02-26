@@ -73,6 +73,14 @@ public class CollectionsPlayground {
         return output;
     }
 
+    public static Collection<String> disjunction() {
+        var first = List.of("A", "B", "C");
+        var second = List.of("C", "D", "E");
+        var result = CollectionUtils.disjunction(first, second);
+        result.forEach(log::info);
+        return result;
+    }
+
     private static Map.Entry<String, Integer> fromSimpleMapping(String input) {
         String[] splitInput = StringUtils.split(input, ':');
         return new AbstractMap.SimpleEntry<>(splitInput[0], Integer.valueOf(splitInput[1]));
