@@ -12,19 +12,19 @@ class SelectiveJsonCharsetConverterTest {
     @Test
     void convert() {
         @Language("JSON")
-        var input = "{\n" +
-                "  \"key[xxxyyy]}\": \"p\\\"ssssŠ\\\"xy\\\"\\\"}}}}]{{{{fff}\",\n" +
-                "  " +
-                "\"array\": [\n" +
-                "    {\n" +
-                "      \"arrKey1\": \"value[[[[[\\\"[{{{{{\\\"\"\n" +
-                "    },\n" +
-                "    " +
-                "{\n" +
-                "      \"arrKey2\": \"value[s[\\\"[{{{{{\\\"\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+        var input = """
+                {
+                  "key[xxxyyy]}": "p\\"ssssŠ\\"xy\\"\\"}}}}]{{{{fff}",
+                  "array": [
+                    {
+                      "arrKey1": "value[[[[[\\"[{{{]]]{{\\""
+                    },
+                    {
+                      "arrKey2": "value[s[\\"[{{{{]]\\\\{\\""
+                    }
+                  ]
+                }
+                """;
         var output = SelectiveJsonCharsetConverter.convert(input);
         log.info(output);
     }
