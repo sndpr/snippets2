@@ -19,8 +19,13 @@ public interface EitherFunction<T, R, EX extends Throwable> extends Function<T, 
 
     R throwingApply(T t) throws EX;
 
-    static <T, R, EX extends Throwable> EitherFunction<T, R, EX> of(Function<T, Either<EX, R>> function) {
-        return (EitherFunction<T, R, EX>) function;
+    static <T, R, EX extends Throwable> EitherFunction<T, R, EX> of(ThrowingFunction<T, R, EX> throwingFunction) {
+        return throwingFunction::apply;
+    }
+
+    @FunctionalInterface
+    interface ThrowingFunction<T, R, EX extends Throwable> {
+        R apply(T t) throws EX;
     }
 
 }

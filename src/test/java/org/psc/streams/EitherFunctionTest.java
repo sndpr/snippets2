@@ -31,6 +31,23 @@ class EitherFunctionTest {
         Assertions.assertThat(validUsers.size()).isEqualTo(3);
     }
 
+    @Test
+    void testApplyFromThrowingFunction() {
+
+        var users = List.of("a1", "b", "c2", "d", "Eee");
+
+        List<Either<IOException, User>> eithers = users.stream()
+                .map(EitherFunction.of(User::fromUsername))
+                .collect(toList());
+
+        List<User> validUsers = eithers.stream()
+                .filter(Either::isRight)
+                .map(Either::get)
+                .collect(toList());
+
+        Assertions.assertThat(validUsers.size()).isEqualTo(3);
+    }
+
     @Data
     @AllArgsConstructor
     private static class User {
