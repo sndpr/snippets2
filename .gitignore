@@ -16,3 +16,4 @@ target/test-classes/org/psc/fieldfilter/FieldFilterTest.class
 target/
 .idea/codeStyles/codeStyleConfig.xml
 .idea/codeStyles/Project.xml
+/.idea/
