@@ -1,9 +1,6 @@
 package org.psc.streams;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Wither;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +76,7 @@ public class GroupingReducer {
     }
 
     @Data
-    @Wither
+    @With
     @NoArgsConstructor
     @AllArgsConstructor
     @SuppressWarnings("unchecked")
@@ -92,7 +89,7 @@ public class GroupingReducer {
     }
 
     @Data
-    @Wither
+    @With
     @NoArgsConstructor
     @AllArgsConstructor
     @EqualsAndHashCode
