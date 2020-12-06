@@ -126,7 +126,7 @@ public class SelectionCriteria {
 
         @Override
         public String build() {
-            var resolvedOrderByClause =
+            String resolvedOrderByClause =
                     !orderBy.isEmpty() ?
                             orderBy.stream()
                                     .map(it -> {
@@ -136,7 +136,7 @@ public class SelectionCriteria {
                                     .collect(joining(" ", " ORDER BY", ""))
                             : "";
 
-            var resolvedFilterClause = var2Filters.stream()
+            String resolvedFilterClause = var2Filters.stream()
                     .map(it -> it.prefix + it.criterion + it.suffix)
                     .collect(joining(" "));
 
