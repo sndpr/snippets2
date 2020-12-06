@@ -2,18 +2,18 @@ package org.psc.sql;
 
 import lombok.*;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.prependIfMissing;
+
 // PROTOTYPING
 public class SelectionCriteria {
 
-    interface Builder {
+    interface Builder extends FilterContext {
 
         // variant 1
         <T> Builder and(IntermediateCriterion criterion);
@@ -21,9 +21,15 @@ public class SelectionCriteria {
         <T> Builder or(IntermediateCriterion criterion);
 
         // variant 2
-        Builder and(Consumer<Builder> statementBuilderConsumer);
+        Builder orderBy(String... orderBy);
 
-        Builder or(Consumer<Builder> statementBuilderConsumer);
+        String build();
+    }
+
+    interface FilterContext {
+        Builder and(Consumer<FilterContext> statementBuilderConsumer);
+
+        Builder or(Consumer<FilterContext> statementBuilderConsumer);
 
         Builder and();
 
@@ -34,8 +40,6 @@ public class SelectionCriteria {
         <T> Builder in(String parameterName, List<T> value, Function<T, String> valueMapper);
 
         Builder like(String parameterName, String value);
-
-        String build();
     }
 
     static class ProtoBuilder implements Builder {
@@ -45,6 +49,8 @@ public class SelectionCriteria {
         private final Deque<CriterionSpec> var2Filters = new ArrayDeque<>();
 
         private final Stack<String> clauseOperatorStack = new Stack<>();
+
+        private final List<String> orderBy = new ArrayList<>();
 
         // variant 1
         @Override
@@ -67,19 +73,25 @@ public class SelectionCriteria {
             return this;
         }
 
+        @Override
+        public Builder orderBy(String... orderBy) {
+            this.orderBy.addAll(List.of(orderBy));
+            return this;
+        }
+
         // variant 2
         @Override
-        public Builder and(Consumer<Builder> statementBuilderConsumer) {
+        public Builder and(Consumer<FilterContext> filterContextConsumer) {
             clauseOperatorStack.push("AND (");
-            statementBuilderConsumer.accept(this);
+            filterContextConsumer.accept(this);
             var2Filters.getLast().setSuffix(")");
             return this;
         }
 
         @Override
-        public Builder or(Consumer<Builder> statementBuilderConsumer) {
+        public Builder or(Consumer<FilterContext> filterContextConsumer) {
             clauseOperatorStack.push("OR (");
-            statementBuilderConsumer.accept(this);
+            filterContextConsumer.accept(this);
             var2Filters.getLast().setSuffix(")");
             return this;
         }
@@ -116,9 +128,21 @@ public class SelectionCriteria {
 
         @Override
         public String build() {
-            return var2Filters.stream()
+            var resolvedOrderByClause =
+                    !orderBy.isEmpty() ?
+                            orderBy.stream()
+                                    .map(it -> {
+                                        String[] split = it.split(":");
+                                        return split[0] + " " + split[1];
+                                    })
+                                    .collect(joining(" ", " ORDER BY", ""))
+                            : "";
+
+            var resolvedFilterClause = var2Filters.stream()
                     .map(it -> it.prefix + it.criterion + it.suffix)
-                    .collect(Collectors.joining(" "));
+                    .collect(joining(" "));
+
+            return (resolvedFilterClause + resolvedOrderByClause).trim();
             //            return String.join(" ", filters);
         }
     }
@@ -235,8 +259,7 @@ public class SelectionCriteria {
             return clauseOperator + " " + parameterName + " " + valueOperator + " " +
                     values.stream()
                             .map(valueMapper)
-                            .collect(Collectors.joining(", ", "(", ")"));
+                            .collect(joining(", ", "(", ")"));
         }
     }
-
 }
