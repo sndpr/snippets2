@@ -5,10 +5,8 @@ import lombok.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
-import static org.apache.commons.lang3.StringUtils.prependIfMissing;
+import static java.util.stream.Collectors.joining;
 
 // PROTOTYPING
 public class SelectionCriteria {
