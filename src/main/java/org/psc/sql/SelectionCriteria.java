@@ -13,32 +13,32 @@ import java.util.stream.Collectors;
 // PROTOTYPING
 public class SelectionCriteria {
 
-    interface StatementBuilder {
+    interface Builder {
 
         // variant 1
-        <T> StatementBuilder and(IntermediateCriterion criterion);
+        <T> Builder and(IntermediateCriterion criterion);
 
-        <T> StatementBuilder or(IntermediateCriterion criterion);
+        <T> Builder or(IntermediateCriterion criterion);
 
         // variant 2
-        StatementBuilder and(Consumer<StatementBuilder> statementBuilderConsumer);
+        Builder and(Consumer<Builder> statementBuilderConsumer);
 
-        StatementBuilder or(Consumer<StatementBuilder> statementBuilderConsumer);
+        Builder or(Consumer<Builder> statementBuilderConsumer);
 
-        StatementBuilder and();
+        Builder and();
 
-        StatementBuilder or();
+        Builder or();
 
-        <T> StatementBuilder is(String parameterName, T value, Function<T, String> valueMapper);
+        <T> Builder is(String parameterName, T value, Function<T, String> valueMapper);
 
-        <T> StatementBuilder in(String parameterName, List<T> value, Function<T, String> valueMapper);
+        <T> Builder in(String parameterName, List<T> value, Function<T, String> valueMapper);
 
-        StatementBuilder like(String parameterName, String value);
+        Builder like(String parameterName, String value);
 
         String build();
     }
 
-    static class ProtoBuilder implements StatementBuilder {
+    static class ProtoBuilder implements Builder {
 
         private final Deque<String> filters = new ArrayDeque<>();
 
@@ -48,7 +48,7 @@ public class SelectionCriteria {
 
         // variant 1
         @Override
-        public <T> StatementBuilder and(IntermediateCriterion criterion) {
+        public <T> Builder and(IntermediateCriterion criterion) {
             // first one without "clause operator" to allow for WHEN???
             if (!filters.isEmpty()) {
                 criterion.withClauseOperator("AND");
@@ -58,7 +58,7 @@ public class SelectionCriteria {
         }
 
         @Override
-        public <T> StatementBuilder or(IntermediateCriterion criterion) {
+        public <T> Builder or(IntermediateCriterion criterion) {
             // first one without "clause operator" to allow for WHEN???
             if (!filters.isEmpty()) {
                 criterion.withClauseOperator("OR");
@@ -69,7 +69,7 @@ public class SelectionCriteria {
 
         // variant 2
         @Override
-        public StatementBuilder and(Consumer<StatementBuilder> statementBuilderConsumer) {
+        public Builder and(Consumer<Builder> statementBuilderConsumer) {
             clauseOperatorStack.push("AND (");
             statementBuilderConsumer.accept(this);
             var2Filters.getLast().setSuffix(")");
@@ -77,7 +77,7 @@ public class SelectionCriteria {
         }
 
         @Override
-        public StatementBuilder or(Consumer<StatementBuilder> statementBuilderConsumer) {
+        public Builder or(Consumer<Builder> statementBuilderConsumer) {
             clauseOperatorStack.push("OR (");
             statementBuilderConsumer.accept(this);
             var2Filters.getLast().setSuffix(")");
@@ -85,19 +85,19 @@ public class SelectionCriteria {
         }
 
         @Override
-        public StatementBuilder and() {
+        public Builder and() {
             clauseOperatorStack.push("AND ");
             return this;
         }
 
         @Override
-        public StatementBuilder or() {
+        public Builder or() {
             clauseOperatorStack.push("OR ");
             return this;
         }
 
         @Override
-        public <T> StatementBuilder is(String parameterName, T value, Function<T, String> valueMapper) {
+        public <T> Builder is(String parameterName, T value, Function<T, String> valueMapper) {
             var clauseOperator = clauseOperatorStack.empty() ? "AND " : clauseOperatorStack.pop();
             var2Filters.add(new CriterionSpec().withPrefix(clauseOperator)
                     .withCriterion(parameterName + " = " + valueMapper.apply(value)));
@@ -105,12 +105,12 @@ public class SelectionCriteria {
         }
 
         @Override
-        public <T> StatementBuilder in(String parameterName, List<T> value, Function<T, String> valueMapper) {
+        public <T> Builder in(String parameterName, List<T> value, Function<T, String> valueMapper) {
             return null;
         }
 
         @Override
-        public StatementBuilder like(String parameterName, String value) {
+        public Builder like(String parameterName, String value) {
             return null;
         }
 
