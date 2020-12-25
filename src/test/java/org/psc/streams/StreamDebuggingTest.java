@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 
-public class StreamDebuggingTest {
+class StreamDebuggingTest {
 
     @Test
     void testDebugStream() {
-
         List<String> dataPoints1 = List.of("first", "second", "third", "end");
         var firstEntity = new TestEntity()
                 .withDataPoints(dataPoints1)
@@ -36,6 +36,25 @@ public class StreamDebuggingTest {
                 .collect(Collectors.joining());
 
         assertThat(collected, is("fstsu"));
+    }
+
+    @Test
+    void testTeeing() {
+        List<String> dataPoints = List.of("first", "second", "third", "end", "aaa", "bbb", "defg");
+        // this makes no sense, but just to demonstrate what teeing does
+        List<String> collected = dataPoints.stream()
+                .map(String::toUpperCase)
+                .collect(Collectors.teeing(Collectors.groupingBy(String::length), Collectors.toList(),
+                        (map, list) -> {
+                            list.addAll(map.entrySet()
+                                    .stream()
+                                    .map(it -> it.getKey() + ":" + it.getValue())
+                                    .collect(Collectors.toList()));
+                            return list;
+                        }));
+        assertThat(collected,
+                containsInAnyOrder("FIRST", "SECOND", "THIRD", "END", "AAA", "BBB", "DEFG", "3:[END, AAA, BBB]",
+                        "4:[DEFG]", "5:[FIRST, THIRD]", "6:[SECOND]"));
     }
 
     @Data
