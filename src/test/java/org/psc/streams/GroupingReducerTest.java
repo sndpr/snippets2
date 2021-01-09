@@ -11,7 +11,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
-public class GroupingReducerTest {
+class GroupingReducerTest {
 
     @Test
     void testReduce() {
