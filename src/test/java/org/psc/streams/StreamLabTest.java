@@ -46,4 +46,15 @@ class StreamLabTest {
 
     }
 
+    @Test
+    void testWithIndex() {
+        List<StreamLab.IndexedValue<String>> indexedValues = Stream.of("A", "xyz", "testst")
+                .map(StreamLab.withIndex())
+                .toList();
+        assertThat(indexedValues).containsExactly(
+                new StreamLab.IndexedValue<>(0, "A"),
+                new StreamLab.IndexedValue<>(1, "xyz"),
+                new StreamLab.IndexedValue<>(2, "testst"));
+    }
+
 }
