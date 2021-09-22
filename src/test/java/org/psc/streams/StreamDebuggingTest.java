@@ -12,8 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 class StreamDebuggingTest {
 
@@ -36,6 +35,18 @@ class StreamDebuggingTest {
                 .collect(Collectors.joining());
 
         assertThat(collected, is("fstsu"));
+    }
+
+    @Test
+    void testMapMulti() {
+        List<Character> chars = Stream.of("abc", "def", "ghi", "zzz", "111")
+                .mapMulti((s, consumer) -> s.chars()
+                        .mapToObj(i -> (char) i)
+                        .forEach(consumer))
+                .map(o -> (Character) o)
+                .toList();
+
+        assertThat(chars, contains('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'z', 'z', 'z', '1', '1', '1'));
     }
 
     @Test
