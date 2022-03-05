@@ -10,6 +10,7 @@ public record CustomerAsRecord(
         String surname,
         BigDecimal points,
         LocalDate joined,
-        LocalDateTime lastAccess
+        LocalDateTime lastAccess,
+        boolean flagged
 ) {
 }

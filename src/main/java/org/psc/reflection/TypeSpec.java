@@ -52,18 +52,19 @@ public class TypeSpec<T> {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
 
         Map<String, Method> gettersAndSettersByName = Arrays.stream(type.getDeclaredMethods())
-                .filter(it -> it.getName().startsWith("get") || it.getName().startsWith("set"))
+                .filter(it -> it.getName().startsWith("get") || it.getName().startsWith("is") || it.getName().startsWith("set"))
                 .collect(Collectors.toMap(Method::getName, Function.identity()));
 
         Map<String, GetterAndSetter> methodsByFieldName = Arrays.stream(type.getDeclaredFields())
                 .mapMulti((Field field, Consumer<Field> consumer) -> {
-                    if (gettersAndSettersByName.containsKey("get" + capitalize(field.getName()))||
+                    if (gettersAndSettersByName.containsKey("get" + capitalize(field.getName())) ||
+                            gettersAndSettersByName.containsKey("is" + capitalize(field.getName())) ||
                             gettersAndSettersByName.containsKey("set" + capitalize(field.getName()))) {
                         consumer.accept(field);
                     }
                 })
                 .collect(Collectors.toMap(Field::getName, field -> new GetterAndSetter(
-                        gettersAndSettersByName.get("get" + capitalize(field.getName())),
+                        getGetter(gettersAndSettersByName, field),
                         gettersAndSettersByName.get("set" + capitalize(field.getName())))));
 
         getters = Arrays.stream(type.getDeclaredFields())
@@ -82,6 +83,15 @@ public class TypeSpec<T> {
                 .map(it -> unreflectMethod(lookup, it))
                 .toList();
 
+    }
+
+    private Method getGetter(Map<String, Method> gettersAndSettersByName, Field field) {
+        var getter = gettersAndSettersByName.get("get" + capitalize(field.getName()));
+        if (getter == null) {
+            return gettersAndSettersByName.get("is" + capitalize(field.getName()));
+        } else {
+            return getter;
+        }
     }
 
     public static <T> TypeSpec.Builder<T> forType(Class<T> type) {
@@ -133,14 +143,6 @@ public class TypeSpec<T> {
     private MethodHandle unreflectMethod(MethodHandles.Lookup lookup, Method method) {
         try {
             return lookup.unreflect(method);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private MethodHandle findSetter(MethodHandles.Lookup lookup, Field field) {
-        try {
-            return lookup.unreflectSetter(field);
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }

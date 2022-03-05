@@ -15,4 +15,5 @@ public class CustomerAsBean {
     BigDecimal points;
     LocalDate joined;
     LocalDateTime lastAccess;
+    boolean flagged;
 }
