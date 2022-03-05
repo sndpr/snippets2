@@ -25,7 +25,7 @@ public class GroupingReducer {
                                 .stream()
                                 .map(e -> e.get(Integer.class))
                                 .filter(Objects::nonNull)
-                                .collect(Collectors.toList())))
+                                .toList()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
