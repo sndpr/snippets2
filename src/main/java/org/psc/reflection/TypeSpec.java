@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -40,6 +41,7 @@ public class TypeSpec<T> {
     private final Map<Class<?>, Function<?, String>> typeMappings;
     private final List<FieldResolutionSpec<T>> getters;
     private final List<FieldNameWithMethodHandle> setters;
+    private final Constructor<T> resolvedAllArgsConstructor;
 
     public TypeSpec(Class<T> type, String delimiter) {
         this(type, delimiter, DEFAULT_NULL_REPLACEMENT, Collections.emptyMap(), Collections.emptyMap());
@@ -59,7 +61,8 @@ public class TypeSpec<T> {
         this.typeMappings = new ConcurrentHashMap<>(typeMappings);
 
         MethodHandles.Lookup lookup = MethodHandles.lookup();
-
+        // for now, we're using the declaredFields + declaredMethods only, which means, that inherited components
+        // won't be included
         Map<String, Method> gettersAndSettersByName = Arrays.stream(type.getDeclaredMethods())
                 .filter(it -> it.getName().startsWith(GET_PREFIX) || it.getName().startsWith(IS_PREFIX) ||
                         it.getName().startsWith(SET_PREFIX))
@@ -93,6 +96,19 @@ public class TypeSpec<T> {
                 .map(it -> new FieldNameWithMethodHandle(it.getName(), unreflectMethod(lookup, it)))
                 .toList();
 
+        // no setters, so we have to try deserialization by using an AllArgsConstructor
+        if (setters.isEmpty()) {
+            // again, only declaredFields for now
+            try {
+                resolvedAllArgsConstructor = type.getDeclaredConstructor(
+                        Arrays.stream(type.getDeclaredFields()).sequential().map(Field::getType).toArray(Class[]::new));
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException(e);
+            }
+        } else {
+            resolvedAllArgsConstructor = null;
+        }
+
     }
 
     private Method getGetter(Map<String, Method> gettersAndSettersByName, Field field) {
@@ -113,6 +129,15 @@ public class TypeSpec<T> {
                 .map(resolveValueAsString(object))
                 .collect(Collectors.joining(delimiter, "", ""));
     }
+
+    public T deserialize(String value) {
+        String[] split = value.split(delimiter);
+
+        // TODO: how should deserialization of custom null values work?
+
+        return null;
+    }
+
 
     @NotNull
     private Function<FieldResolutionSpec<T>, String> resolveValueAsString(T object) {

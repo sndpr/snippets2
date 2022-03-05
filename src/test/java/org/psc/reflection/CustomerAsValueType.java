@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @SuppressWarnings("ClassCanBeRecord")
 @Value
-public class CustomerAsBean {
+public class CustomerAsValueType {
     int id;
     String name;
     String surname;
