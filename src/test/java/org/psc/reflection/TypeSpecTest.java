@@ -17,7 +17,7 @@ class TypeSpecTest {
                 .build();
 
         var customer = new CustomerAsBean(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
-                LocalDateTime.of(2022,3,4,14,56), false);
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
         String serialized = customerAsBeanTypeSpec.serialize(customer);
 
@@ -27,11 +27,12 @@ class TypeSpecTest {
     @Test
     void shouldSerializeWithCustomFieldMapping() {
         TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
-                .fieldMapping("id", customer -> StringUtils.leftPad(String.valueOf(customer.getId()), 5, '0'))
+                .serialization(builder -> builder
+                        .fieldMapping("id", customer -> StringUtils.leftPad(String.valueOf(customer.getId()), 5, '0')))
                 .build();
 
         var customer = new CustomerAsBean(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
-                LocalDateTime.of(2022,3,4,14,56), false);
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
         String serialized = customerAsBeanTypeSpec.serialize(customer);
 
@@ -41,11 +42,11 @@ class TypeSpecTest {
     @Test
     void shouldSerializeWithCustomTypeMapping() {
         TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
-                .typeMapping(int.class, i -> String.valueOf(100 * i))
+                .serialization(builder -> builder.typeMapping(int.class, i -> String.valueOf(100 * i)))
                 .build();
 
         var customer = new CustomerAsBean(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
-                LocalDateTime.of(2022,3,4,14,56), false);
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
         String serialized = customerAsBeanTypeSpec.serialize(customer);
 
@@ -55,12 +56,13 @@ class TypeSpecTest {
     @Test
     void shouldSerializeWithCustomFieldMappingDueToHigherPriority() {
         TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
-                .typeMapping(int.class, i -> String.valueOf(100 * i))
-                .fieldMapping("id", customer -> StringUtils.leftPad(String.valueOf(customer.getId()), 5, '0'))
+                .serialization(builder -> builder
+                        .typeMapping(int.class, i -> String.valueOf(100 * i))
+                        .fieldMapping("id", customer -> StringUtils.leftPad(String.valueOf(customer.getId()), 5, '0')))
                 .build();
 
         var customer = new CustomerAsBean(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
-                LocalDateTime.of(2022,3,4,14,56), false);
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
         String serialized = customerAsBeanTypeSpec.serialize(customer);
 

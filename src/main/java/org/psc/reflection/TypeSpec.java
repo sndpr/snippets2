@@ -184,15 +184,16 @@ public class TypeSpec<T> {
     }
 
     public static class Builder<T> {
-
         private final Class<T> type;
+        private final SerializationBuilder<T> serializationBuilder;
+        private final DeserializationBuilder<T> deserializationBuilder;
+
         private String delimiter = DEFAULT_DELIMITER;
-        private final Map<String, Function<T, String>> fieldMappings = new ConcurrentHashMap<>();
-        private final Map<Class<?>, Function<?, String>> typeMappings =
-                new ConcurrentHashMap<>(DEFAULT_TYPE_MAPPINGS);
 
         Builder(Class<T> type) {
             this.type = type;
+            serializationBuilder = new SerializationBuilder<>();
+            deserializationBuilder = new DeserializationBuilder<>();
         }
 
         public Builder<T> delimiter(String delimiter) {
@@ -200,20 +201,51 @@ public class TypeSpec<T> {
             return this;
         }
 
-        public Builder<T> fieldMapping(String fieldName, Function<T, String> mapper) {
-            fieldMappings.put(fieldName, mapper);
+        public Builder<T> serialization(Consumer<SerializationBuilder<T>> consumer) {
+            consumer.accept(serializationBuilder);
             return this;
         }
 
-        public <U> Builder<T> typeMapping(Class<U> from, Function<U, String> mapper) {
-            typeMappings.put(from, mapper);
+        public Builder<T> deserialization(Consumer<DeserializationBuilder<T>> consumer) {
+            consumer.accept(deserializationBuilder);
             return this;
         }
 
         public TypeSpec<T> build() {
-            return new TypeSpec<>(type, delimiter, fieldMappings, typeMappings);
+            return new TypeSpec<>(type, delimiter, serializationBuilder.fieldMappings, serializationBuilder.typeMappings);
         }
 
+    }
+
+    public static class SerializationBuilder<T> {
+        private final Map<String, Function<T, String>> fieldMappings = new ConcurrentHashMap<>();
+        private final Map<Class<?>, Function<?, String>> typeMappings = new ConcurrentHashMap<>(DEFAULT_TYPE_MAPPINGS);
+
+        private SerializationBuilder() {
+        }
+
+        public SerializationBuilder<T> fieldMapping(String fieldName, Function<T, String> mapper) {
+            fieldMappings.put(fieldName, mapper);
+            return this;
+        }
+
+        public <U> SerializationBuilder<T> typeMapping(Class<U> from, Function<U, String> mapper) {
+            typeMappings.put(from, mapper);
+            return this;
+        }
+    }
+
+    public static class DeserializationBuilder<T> {
+        private DeserializationBuilder() {
+        }
+
+        public DeserializationBuilder<T> fieldMapping(String fieldName, Function<T, String> mapper) {
+            return this;
+        }
+
+        public <U> DeserializationBuilder<T> typeMapping(Class<U> from, Function<U, String> mapper) {
+            return this;
+        }
     }
 
     private record FieldResolutionSpec<T>(
