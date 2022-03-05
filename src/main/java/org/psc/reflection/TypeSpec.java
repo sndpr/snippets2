@@ -21,6 +21,7 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 
 public class TypeSpec<T> {
     private static final String DEFAULT_DELIMITER = ";";
+    private static final String DEFAULT_NULL_REPLACEMENT = "";
     private static final String GET_PREFIX = "get";
     private static final String IS_PREFIX = "is";
     private static final String SET_PREFIX = "set";
@@ -41,7 +42,7 @@ public class TypeSpec<T> {
     private final List<FieldNameWithMethodHandle> setters;
 
     public TypeSpec(Class<T> type, String delimiter) {
-        this(type, delimiter, "", Collections.emptyMap(), Collections.emptyMap());
+        this(type, delimiter, DEFAULT_NULL_REPLACEMENT, Collections.emptyMap(), Collections.emptyMap());
     }
 
     public TypeSpec(Class<T> type) {
@@ -226,7 +227,7 @@ public class TypeSpec<T> {
     public static class SerializationBuilder<T> {
         private final Map<String, Function<T, String>> fieldMappings = new ConcurrentHashMap<>();
         private final Map<Class<?>, Function<?, String>> typeMappings = new ConcurrentHashMap<>(DEFAULT_TYPE_MAPPINGS);
-        private String nullReplacement = "";
+        private String nullReplacement = DEFAULT_NULL_REPLACEMENT;
 
         private SerializationBuilder() {
         }
