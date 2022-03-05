@@ -20,8 +20,11 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 public class TypeSpec<T> {
-
     private static final String DEFAULT_DELIMITER = ";";
+    private static final String GET_PREFIX = "get";
+    private static final String IS_PREFIX = "is";
+    private static final String SET_PREFIX = "set";
+
     private static final Map<Class<?>, Function<?, String>> DEFAULT_TYPE_MAPPINGS = Map.of(
             String.class, Function.identity(),
             BigDecimal.class, (BigDecimal bd) -> bd.toPlainString(),
@@ -29,47 +32,49 @@ public class TypeSpec<T> {
             LocalDate.class, (LocalDate ld) -> ld.format(DateTimeFormatter.ISO_LOCAL_DATE),
             LocalDateTime.class, (LocalDateTime ldt) -> ldt.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     );
-
     private final String delimiter;
     private final Class<T> type;
+    private final String nullReplacement;
     private final Map<String, Function<T, String>> fieldMappings;
     private final Map<Class<?>, Function<?, String>> typeMappings;
     private final List<FieldResolutionSpec<T>> getters;
     private final List<FieldNameWithMethodHandle> setters;
 
     public TypeSpec(Class<T> type, String delimiter) {
-        this(type, delimiter, Collections.emptyMap(), Collections.emptyMap());
+        this(type, delimiter, "", Collections.emptyMap(), Collections.emptyMap());
     }
 
     public TypeSpec(Class<T> type) {
         this(type, DEFAULT_DELIMITER);
     }
 
-    private TypeSpec(Class<T> type, String delimiter, Map<String, Function<T, String>> fieldMappings,
+    private TypeSpec(Class<T> type, String delimiter, String nullReplacement,
+            Map<String, Function<T, String>> fieldMappings,
             Map<Class<?>, Function<?, String>> typeMappings) {
         this.type = type;
         this.delimiter = delimiter;
+        this.nullReplacement = nullReplacement;
         this.fieldMappings = new ConcurrentHashMap<>(fieldMappings);
         this.typeMappings = new ConcurrentHashMap<>(typeMappings);
 
         MethodHandles.Lookup lookup = MethodHandles.lookup();
 
         Map<String, Method> gettersAndSettersByName = Arrays.stream(type.getDeclaredMethods())
-                .filter(it -> it.getName().startsWith("get") || it.getName().startsWith("is") ||
-                        it.getName().startsWith("set"))
+                .filter(it -> it.getName().startsWith(GET_PREFIX) || it.getName().startsWith(IS_PREFIX) ||
+                        it.getName().startsWith(SET_PREFIX))
                 .collect(Collectors.toMap(Method::getName, Function.identity()));
 
         Map<String, GetterAndSetter> methodsByFieldName = Arrays.stream(type.getDeclaredFields())
                 .mapMulti((Field field, Consumer<Field> consumer) -> {
-                    if (gettersAndSettersByName.containsKey("get" + capitalize(field.getName())) ||
-                            gettersAndSettersByName.containsKey("is" + capitalize(field.getName())) ||
-                            gettersAndSettersByName.containsKey("set" + capitalize(field.getName()))) {
+                    if (gettersAndSettersByName.containsKey(GET_PREFIX + capitalize(field.getName())) ||
+                            gettersAndSettersByName.containsKey(IS_PREFIX + capitalize(field.getName())) ||
+                            gettersAndSettersByName.containsKey(SET_PREFIX + capitalize(field.getName()))) {
                         consumer.accept(field);
                     }
                 })
                 .collect(Collectors.toMap(Field::getName,
                         field -> new GetterAndSetter(field, getGetter(gettersAndSettersByName, field),
-                                gettersAndSettersByName.get("set" + capitalize(field.getName())))));
+                                gettersAndSettersByName.get(SET_PREFIX + capitalize(field.getName())))));
 
         getters = Arrays.stream(type.getDeclaredFields())
                 .map(it -> methodsByFieldName.get(it.getName()))
@@ -90,9 +95,9 @@ public class TypeSpec<T> {
     }
 
     private Method getGetter(Map<String, Method> gettersAndSettersByName, Field field) {
-        var getter = gettersAndSettersByName.get("get" + capitalize(field.getName()));
+        var getter = gettersAndSettersByName.get(GET_PREFIX + capitalize(field.getName()));
         if (getter == null) {
-            return gettersAndSettersByName.get("is" + capitalize(field.getName()));
+            return gettersAndSettersByName.get(IS_PREFIX + capitalize(field.getName()));
         } else {
             return getter;
         }
@@ -114,7 +119,7 @@ public class TypeSpec<T> {
             try {
                 Object fieldValue = fieldResolutionSpec.methodHandle().invoke(object);
                 if (fieldValue == null) {
-                    return "";
+                    return nullReplacement;
                 }
 
                 var mapped = fieldResolutionSpec.toStringMapper().apply(object, fieldValue);
@@ -212,7 +217,8 @@ public class TypeSpec<T> {
         }
 
         public TypeSpec<T> build() {
-            return new TypeSpec<>(type, delimiter, serializationBuilder.fieldMappings, serializationBuilder.typeMappings);
+            return new TypeSpec<>(type, delimiter, serializationBuilder.nullReplacement,
+                    serializationBuilder.fieldMappings, serializationBuilder.typeMappings);
         }
 
     }
@@ -220,8 +226,14 @@ public class TypeSpec<T> {
     public static class SerializationBuilder<T> {
         private final Map<String, Function<T, String>> fieldMappings = new ConcurrentHashMap<>();
         private final Map<Class<?>, Function<?, String>> typeMappings = new ConcurrentHashMap<>(DEFAULT_TYPE_MAPPINGS);
+        private String nullReplacement = "";
 
         private SerializationBuilder() {
+        }
+
+        public SerializationBuilder<T> nullReplacement(String nullReplacement) {
+            this.nullReplacement = nullReplacement;
+            return this;
         }
 
         public SerializationBuilder<T> fieldMapping(String fieldName, Function<T, String> mapper) {

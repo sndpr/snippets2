@@ -25,6 +25,33 @@ class TypeSpecTest {
     }
 
     @Test
+    void shouldSerializeNullValueWithDefaults() {
+        TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
+                .build();
+
+        var customer = new CustomerAsBean(1, null, "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsBeanTypeSpec.serialize(customer);
+
+        assertThat(serialized).isEqualTo("1;;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
+    }
+
+    @Test
+    void shouldSerializeNullWithCustomFallback() {
+        TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
+                .serialization(builder -> builder.nullReplacement("NULL"))
+                .build();
+
+        var customer = new CustomerAsBean(1, null, "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsBeanTypeSpec.serialize(customer);
+
+        assertThat(serialized).isEqualTo("1;NULL;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
+    }
+
+    @Test
     void shouldSerializeWithCustomFieldMapping() {
         TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
                 .serialization(builder -> builder
