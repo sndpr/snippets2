@@ -1,11 +1,11 @@
 package org.psc.resteasy;
 
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientRequestFilter;
+import jakarta.ws.rs.client.WebTarget;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.WebTarget;
 import java.util.Map;
 import java.util.stream.Collectors;
 
