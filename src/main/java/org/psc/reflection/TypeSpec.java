@@ -307,11 +307,13 @@ public class TypeSpec<T> {
     }
 
     private MethodHandle unreflectMethod(MethodHandles.Lookup lookup, Method method) {
+        if (method == null) {
+            return null;
+        }
         try {
             return lookup.unreflect(method);
-        } catch (Exception e) {
-            return null;
-            //            throw new IllegalStateException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
         }
     }
 
