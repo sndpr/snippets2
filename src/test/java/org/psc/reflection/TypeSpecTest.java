@@ -110,4 +110,35 @@ class TypeSpecTest {
         assertThat(serialized).isEqualTo("00001;Abc;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
+    @Test
+    void shouldSerializeWithCustomPositions() {
+        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+                .position("joined", 1)
+                .position("id", Integer.MAX_VALUE)
+                .build();
+
+        var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsBeanTypeSpec.serialize(customer);
+
+        assertThat(serialized).isEqualTo("2010-04-17;Abc;Def;15.93;2022-03-04T14:56:00;false;1");
+    }
+
+    @Test
+    void shouldDeserializeWithCustomPositions() {
+        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+                .position("joined", 1)
+                .position("id", Integer.MAX_VALUE)
+                .build();
+
+        var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsBeanTypeSpec.serialize(customer);
+
+        var deserialized = customerAsBeanTypeSpec.deserialize(serialized);
+        assertThat(deserialized).isEqualTo(customer);
+    }
+
 }
