@@ -183,5 +183,44 @@ class TypeSpecTest {
         assertThat(deserialized).isEqualTo(customer);
     }
 
+    @Test
+    void shouldSerializeWithCustomPositionsFromAnnotations() {
+        TypeSpec<CustomerAsBeanWithPositionAnnotations> customerTypeSpec = TypeSpec.forType(CustomerAsBeanWithPositionAnnotations.class)
+                .build();
+
+        var customer = new CustomerAsBeanWithPositionAnnotations();
+        customer.setId(1);
+        customer.setName("Abc");
+        customer.setSurname("Def");
+        customer.setPoints(new BigDecimal("15.93"));
+        customer.setJoined(LocalDate.of(2010, 4, 17));
+        customer.setLastAccess(LocalDateTime.of(2022, 3, 4, 14, 56));
+        customer.setFlagged(false);
+
+        String serialized = customerTypeSpec.serialize(customer);
+
+        assertThat(serialized).isEqualTo("2010-04-17;false;Abc;Def;15.93;2022-03-04T14:56:00;1");
+    }
+
+    @Test
+    void shouldDeserializeWithCustomPositionsFromAnnotations() {
+        TypeSpec<CustomerAsBeanWithPositionAnnotations> customerTypeSpec = TypeSpec.forType(CustomerAsBeanWithPositionAnnotations.class)
+                .build();
+
+        var customer = new CustomerAsBeanWithPositionAnnotations();
+        customer.setId(1);
+        customer.setName("Abc");
+        customer.setSurname("Def");
+        customer.setPoints(new BigDecimal("15.93"));
+        customer.setJoined(LocalDate.of(2010, 4, 17));
+        customer.setLastAccess(LocalDateTime.of(2022, 3, 4, 14, 56));
+        customer.setFlagged(false);
+
+        String serialized = customerTypeSpec.serialize(customer);
+        var deserialized = customerTypeSpec.deserialize(serialized);
+
+        assertThat(deserialized).isEqualTo(customer);
+    }
+
 
 }
