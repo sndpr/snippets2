@@ -25,6 +25,20 @@ class TypeSpecTest {
     }
 
     @Test
+    void shouldDeserializeWithDefaults() {
+        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+                .build();
+
+        var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
+                LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsBeanTypeSpec.serialize(customer);
+
+        var deserialized = customerAsBeanTypeSpec.deserialize(serialized);
+        assertThat(deserialized).isEqualTo(customer);
+    }
+
+    @Test
     void shouldSerializeNullValueWithDefaults() {
         TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .build();
@@ -40,7 +54,7 @@ class TypeSpecTest {
     @Test
     void shouldSerializeNullWithCustomFallback() {
         TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
-                .serialization(builder -> builder.nullReplacement("NULL"))
+                .nullReplacement("NULL")
                 .build();
 
         var customer = new CustomerAsValueType(1, null, "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
