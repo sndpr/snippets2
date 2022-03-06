@@ -180,7 +180,7 @@ public class TypeSpec<T> {
             String valueToDeserialize = sortedSplit[i];
             Object deserializedValue = currentFieldResolutionSpec.fromStringMapper().apply(valueToDeserialize);
             try {
-                currentFieldResolutionSpec.setterMethodHandle().invoke(deserializedValue);
+                currentFieldResolutionSpec.setterMethodHandle().invoke(instance, deserializedValue);
             } catch (Throwable e) {
                 throw new IllegalStateException(e);
             }

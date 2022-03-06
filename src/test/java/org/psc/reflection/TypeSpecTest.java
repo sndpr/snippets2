@@ -13,24 +13,44 @@ class TypeSpecTest {
 
     @Test
     void shouldSerializeWithDefaults() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .build();
 
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("1;Abc;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
     @Test
-    void shouldDeserializeWithDefaults() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+    void shouldDeserializeValueTypeWithDefaults() {
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .build();
 
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
+
+        var deserialized = customerAsValueTypeTypeSpec.deserialize(serialized);
+        assertThat(deserialized).isEqualTo(customer);
+    }
+
+    @Test
+    void shouldDeserializeBeanWithDefaults() {
+        TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
+                .build();
+
+        var customer = new CustomerAsBean();
+        customer.setId(1);
+        customer.setName("Abc");
+        customer.setSurname("Def");
+        customer.setPoints(new BigDecimal("15.93"));
+        customer.setJoined(LocalDate.of(2010, 4, 17));
+        customer.setLastAccess(LocalDateTime.of(2022, 3, 4, 14, 56));
+        customer.setFlagged(false);
 
         String serialized = customerAsBeanTypeSpec.serialize(customer);
 
@@ -40,34 +60,34 @@ class TypeSpecTest {
 
     @Test
     void shouldSerializeNullValueWithDefaults() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .build();
 
         var customer = new CustomerAsValueType(1, null, "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("1;;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
     @Test
     void shouldSerializeNullWithCustomFallback() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .nullReplacement("NULL")
                 .build();
 
         var customer = new CustomerAsValueType(1, null, "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("1;NULL;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
     @Test
     void shouldSerializeWithCustomFieldMapping() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .serialization(builder -> builder
                         .fieldMapping("id", customer -> StringUtils.leftPad(String.valueOf(customer.getId()), 5, '0')))
                 .build();
@@ -75,28 +95,28 @@ class TypeSpecTest {
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("00001;Abc;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
     @Test
     void shouldSerializeWithCustomTypeMapping() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .serialization(builder -> builder.typeMapping(int.class, i -> String.valueOf(100 * i)))
                 .build();
 
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("100;Abc;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
     @Test
     void shouldSerializeWithCustomFieldMappingDueToHigherPriority() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .serialization(builder -> builder
                         .typeMapping(int.class, i -> String.valueOf(100 * i))
                         .fieldMapping("id", customer -> StringUtils.leftPad(String.valueOf(customer.getId()), 5, '0')))
@@ -105,14 +125,14 @@ class TypeSpecTest {
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("00001;Abc;Def;15.93;2010-04-17;2022-03-04T14:56:00;false");
     }
 
     @Test
     void shouldSerializeWithCustomPositions() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .position("joined", 1)
                 .position("id", Integer.MAX_VALUE)
                 .build();
@@ -120,25 +140,48 @@ class TypeSpecTest {
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
 
-        String serialized = customerAsBeanTypeSpec.serialize(customer);
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
 
         assertThat(serialized).isEqualTo("2010-04-17;Abc;Def;15.93;2022-03-04T14:56:00;false;1");
     }
 
     @Test
-    void shouldDeserializeWithCustomPositions() {
-        TypeSpec<CustomerAsValueType> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
+    void shouldDeserializeValueTypeWithCustomPositions() {
+        TypeSpec<CustomerAsValueType> customerAsValueTypeTypeSpec = TypeSpec.forType(CustomerAsValueType.class)
                 .position("joined", 1)
                 .position("id", Integer.MAX_VALUE)
                 .build();
 
         var customer = new CustomerAsValueType(1, "Abc", "Def", new BigDecimal("15.93"), LocalDate.of(2010, 4, 17),
                 LocalDateTime.of(2022, 3, 4, 14, 56), false);
+
+        String serialized = customerAsValueTypeTypeSpec.serialize(customer);
+
+        var deserialized = customerAsValueTypeTypeSpec.deserialize(serialized);
+        assertThat(deserialized).isEqualTo(customer);
+    }
+
+    @Test
+    void shouldDeserializeBeanWithCustomPositions() {
+        TypeSpec<CustomerAsBean> customerAsBeanTypeSpec = TypeSpec.forType(CustomerAsBean.class)
+                .position("joined", 1)
+                .position("id", Integer.MAX_VALUE)
+                .build();
+
+        var customer = new CustomerAsBean();
+        customer.setId(1);
+        customer.setName("Abc");
+        customer.setSurname("Def");
+        customer.setPoints(new BigDecimal("15.93"));
+        customer.setJoined(LocalDate.of(2010, 4, 17));
+        customer.setLastAccess(LocalDateTime.of(2022, 3, 4, 14, 56));
+        customer.setFlagged(false);
 
         String serialized = customerAsBeanTypeSpec.serialize(customer);
 
         var deserialized = customerAsBeanTypeSpec.deserialize(serialized);
         assertThat(deserialized).isEqualTo(customer);
     }
+
 
 }
