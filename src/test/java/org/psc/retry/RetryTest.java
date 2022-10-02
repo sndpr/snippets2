@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RetryTest {
 
@@ -28,6 +29,15 @@ class RetryTest {
     }
 
     @Test
+    void testFunctionMaxRetriesExceededException() {
+        Function<String, String> failingFunction = s -> {
+            throw new IllegalStateException("no");
+        };
+
+        assertThrows(Retry.MaxRetriesExceededException.class, () -> Retry.retry(failingFunction).apply("s"));
+    }
+
+    @Test
     void testSupplierRetryForever() {
         var atomicCounter = new AtomicInteger(0);
         Supplier<Integer> failingSupplier = () -> {
@@ -43,4 +53,12 @@ class RetryTest {
         assertThat(retryForever.get()).isEqualTo(42);
     }
 
+    @Test
+    void testSupplierMaxRetriesExceededException() {
+        Supplier<Integer> failingSupplier = () -> {
+            throw new IllegalStateException("no");
+        };
+
+        assertThrows(Retry.MaxRetriesExceededException.class, () -> Retry.retry(failingSupplier).get());
+    }
 }
