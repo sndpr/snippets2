@@ -10,10 +10,7 @@ import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.collections4.trie.PatriciaTrie;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
@@ -79,6 +76,14 @@ public class CollectionsPlayground {
         var result = CollectionUtils.disjunction(first, second);
         result.forEach(log::info);
         return result;
+    }
+
+    public static void disjoint() {
+        var first = List.of("A", "B", "C");
+        var second = List.of("D", "E", "F");
+        var third = List.of("A");
+        System.out.println(Collections.disjoint(first, second));
+        System.out.println(Collections.disjoint(first, third));
     }
 
     private static Map.Entry<String, Integer> fromSimpleMapping(String input) {
