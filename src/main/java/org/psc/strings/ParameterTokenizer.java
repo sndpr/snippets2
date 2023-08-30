@@ -8,6 +8,17 @@ import java.util.Map;
 
 public class ParameterTokenizer {
 
+    /**
+     * Parsing a string containing parameters enclosed in parentheses and creating a map of key-value pairs based on the
+     * parsed parameters.
+     * <p>
+     * The keys are derived from the alphabetic characters immediately preceding an opening parenthesis, and the values
+     * are extracted from the content enclosed within the corresponding parentheses.
+     * </p>
+     *
+     * @param parameters
+     * @return
+     */
     public Map<String, String> tokenize(String parameters) {
         var parsedParameters = new HashMap<String, String>();
         String keyReference = null;
