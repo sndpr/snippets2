@@ -9,7 +9,7 @@ public class UnsafeLab {
     public static Unsafe getUnsafe() throws NoSuchFieldException, IllegalAccessException {
         Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
         theUnsafe.setAccessible(true);
-        return  (Unsafe) theUnsafe.get(null);
+        return (Unsafe) theUnsafe.get(null);
     }
 
 

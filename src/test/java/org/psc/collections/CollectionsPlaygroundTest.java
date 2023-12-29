@@ -14,6 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CollectionsPlaygroundTest {
 
     @Test
+    void disjoint() {
+        CollectionsPlayground.disjoint();
+    }
+
+    @Test
     void testOrderedMap() {
         var orderedMap = CollectionsPlayground.orderedMap();
         orderedMap.forEach((key, value) -> log.info("{}: {}", key, value));
